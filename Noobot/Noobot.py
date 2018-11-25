@@ -74,13 +74,6 @@ class Noobot(BaseAgent):
                 self.on_second_jump = True
                 self.next_dodge_time = time.time() + self.DODGE_TIME
 
-    # Closest point to hit ball on target
-    def closest_point(self, x1, y1, x2, y2, x3, y3):
-        k = ((y2 - y1) * (x3 - x1) - (x2 - x1) * (y3 - y1)) / ((y2 - y1) ** 2 + (x2 - x1) ** 2)
-        x4 = x3 - k * (y2 - y1)
-        y4 = y3 + k * (x2 - x1)
-
-        return x4, y4
 
     def get_output(self, packet: GameTickPacket) -> SimpleControllerState:
 
