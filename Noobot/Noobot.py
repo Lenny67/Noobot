@@ -18,7 +18,6 @@ class Noobot(BaseAgent):
         self.DISTANCE_TO_DODGE = 500
         self.DISTANCE_FROM_BALL_TO_BOOST = 1500
         self.POWERSLIDE_ANGLE = 120
-        self.MAXIMUM_DISTANCE_TO_CHASE_TARGET = 750
 
         # Game values
         self.bot_pos = None
@@ -37,6 +36,7 @@ class Noobot(BaseAgent):
         angle_front_to_target = math.degrees(angle_between_bot_and_target - self.bot_yaw)
         
         kickOff = False
+
         # Correct the values
         if angle_front_to_target < -180:
             angle_front_to_target += 2 * 180
@@ -119,27 +119,14 @@ class Noobot(BaseAgent):
 
         # Behind ball
         if (self.index == 0 and self.bot_pos.y < ball_pos.y) or (self.index == 1 and self.bot_pos.y > ball_pos.y):
-            if self.team == 0:
-                enemy_goal = 5000
-            else:
-                enemy_goal = -5000
-            
-            # Closest point to hit on target
-            target = self.closest_point(0, enemy_goal, ball_pos.x, ball_pos.y, self.bot_pos.x, self.bot_pos.y)
-
-            if distance(target[0], target[1], self.bot_pos.x, self.bot_pos.y) > self.MAXIMUM_DISTANCE_TO_CHASE_TARGET and kickOff == False:
-                # Go to the target
-                self.aim(target[0], target[1])
-            else:
-                # Chase ball if close to ball
-                self.aim(ball_pos.x, ball_pos.y)
+            self.aim(ball_pos.x, ball_pos.y)
+            if distance(self.bot_pos.x, self.bot_pos.y, ball_pos.x, ball_pos.y) > self.DISTANCE_FROM_BALL_TO_BOOST and self.bot_pos.z < 18:
                 # Boost
-                if distance(self.bot_pos.x, self.bot_pos.y, ball_pos.x, ball_pos.y) > self.DISTANCE_FROM_BALL_TO_BOOST and self.bot_pos.z < 18:
-                    self.controller.boost = True
+                self.controller.boost = True
+            elif distance(self.bot_pos.x, self.bot_pos.y, ball_pos.x, ball_pos.y) < self.DISTANCE_TO_DODGE and self.bot_pos.z < 18 and ball_pos.z < 220:
                 # Dodge
-                elif distance(self.bot_pos.x, self.bot_pos.y, ball_pos.x, ball_pos.y) < self.DISTANCE_TO_DODGE and self.bot_pos.z < 18 and ball_pos.z < 220:
-                    self.controller.boost = False
-                    self.should_dodge = True
+                self.controller.boost = False
+                self.should_dodge = True
         else: 
             # Go to goal
             if self.team == 0 and kickOff == False:
